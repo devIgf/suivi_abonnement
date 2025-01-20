@@ -20,6 +20,8 @@
     </main>
 
     <footer class="container text-center my-4">
+        <script src="/scripts/cloudflare.js"></script>
+        <script src="/js/app-Xaw6OIO1.js"></script>
         <p>&copy; {{ date('Y') }} IGF-Sn. Tous droits réservés.</p>
     </footer>
 </body>

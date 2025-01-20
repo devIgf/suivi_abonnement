@@ -9,5 +9,12 @@ class Abonnement extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nom', 'date_debut', 'date_fin'];
+    protected $fillable = ['nom','user_id', 'date_debut', 'date_fin'];
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

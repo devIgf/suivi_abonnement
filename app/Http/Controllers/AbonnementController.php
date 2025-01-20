@@ -15,20 +15,34 @@ class AbonnementController extends Controller
         return view('abonnements.index', compact('abonnements'));
     }
 
-    public function create() {
-        return view('abonnements.create');
-    }
+    public function create(Request $request)
+{
+    // Récupérer l'user_id à partir des paramètres de requête (ou d'une autre source)
+    $userId = $request->input('user_id');
+    
+    return view('abonnements.create', compact('userId'));
+}
 
-    public function store(Request $request) {
-        $request->validate([
-            'nom' => 'required|string|max:255',
-            'date_debut' => 'required|date',
-            'date_fin' => 'required|date|after_or_equal:date_debut',
-        ]);
 
-        Abonnement::create($request->all());
-        return redirect()->route('abonnements.index')->with('success', 'Abonnement créé avec succès.');
-    }
+    public function store(Request $request)
+{
+    $request->validate([
+        'nom' => 'required|string|max:255',
+        'date_debut' => 'required|date',
+        'date_fin' => 'required|date',
+        'user_id' => 'required|exists:users,id', // Validation pour s'assurer que l'utilisateur existe
+    ]);
+
+    // Créer un nouvel abonnement
+    Abonnement::create([
+        'nom' => $request->nom,
+        'user_id' => $request->user_id, // Associer l'abonnement à l'utilisateur
+        'date_debut' => $request->date_debut,
+        'date_fin' => $request->date_fin,
+    ]);
+
+    return redirect()->route('clients.show', $request->user_id)->with('success', 'Abonnement ajouté avec succès.');
+}
 
     public function edit(Abonnement $abonnement) {
         return view('abonnements.edit', compact('abonnement'));

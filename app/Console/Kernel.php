@@ -43,7 +43,7 @@ class Kernel extends ConsoleKernel
                 Notification::route('mail', 'justeamour05@gmail.com') // Adresse e-mail destinataire
                     ->notify(new RappelEcheanceNotification($abonnement));
             }
-        })->hourly(); // Assurez-vous que cette ligne est présente
+        })->everyTenMinutes(); // Assurez-vous que cette ligne est présente
     }
     
     

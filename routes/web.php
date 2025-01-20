@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AbonnementController;
+use App\Http\Controllers\UserController;
 use App\Models\Abonnement;
 use Illuminate\Support\Facades\Mail;
 
@@ -17,9 +18,15 @@ use Illuminate\Support\Facades\Mail;
 |
 */
 
-Route::get('/',  [AbonnementController::class, "index"]);
+// Route::get('/',  function () {
+//     return view('welcome');
+// });
+
+Route::get('/', [UserController::class, 'index'])->name('accueil');
 
 Route::resource('abonnements', AbonnementController::class);
+
+Route::resource('clients', UserController::class);
 
 
 // Route::get('/test-email', function () {

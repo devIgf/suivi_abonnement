@@ -18,6 +18,8 @@
 
     <form action="{{ route('abonnements.store') }}" method="POST">
         @csrf
+        <!-- Champ caché pour user_id -->
+        <input type="hidden" name="user_id" value="{{ $userId }}">
         <div class="mb-3">
             <label for="nom" class="form-label">Nom de l'Abonnement</label>
             <input type="text" class="form-control" id="nom" name="nom" required>
@@ -34,7 +36,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Ajouter Abonnement</button>
-        <a href="{{ route('abonnements.index') }}" class="btn btn-secondary">Retour</a>
+        <a href="{{ url()->previous() }}" class="btn btn-secondary">Retour</a>
     </form>
 </div>
 @endsection
