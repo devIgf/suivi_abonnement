@@ -17,7 +17,7 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::findOrFail($id);
-        $abonnements = $user->abonnements; // Récupérer les abonnements de l'utilisateur
+        $abonnements = $user->abonnements;
         
         return view('clients.show', compact('user', 'abonnements'));
     }

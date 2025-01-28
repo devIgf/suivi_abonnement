@@ -20,15 +20,18 @@ class RappelEcheanceNotification extends Notification implements ShouldQueue {
         return ['mail']; // Indique que nous envoyons une notification par e-mail
     }
 
-    public function toMail($notifiable): MailMessage {
+    public function toMail($notifiable): MailMessage
+    {
+        // Récupérer le nom de l'utilisateur associé à l'abonnement
+        $userName = $this->abonnement->user ? $this->abonnement->user->name : 'Cher utilisateur';
+
         return (new MailMessage)
             ->subject('Rappel d\'Échéance d\'Abonnement') // Sujet de l'e-mail
-            ->greeting('Bonjour!')
-            ->line('Ceci est un rappel concernant votre abonnement : ' . $this->abonnement->nom)
-            ->line('Date de début : ' . $this->abonnement->date_debut)
-            ->line('Date de fin : ' . $this->abonnement->date_fin)
-            ->line('N\'oubliez pas de renouveler votre abonnement avant la date d\'échéance.')
-            ->action('Voir Détails', url('/abonnements/' . $this->abonnement->id)) // Lien vers les détails de l'abonnement
+            ->greeting('Bonjour IGF') // Inclut le nom de l'utilisateur
+            ->line('Ceci est un rappel concernant l\'abonnement : ' . $this->abonnement->nom . 'du client '. $userName)
+            ->line('Date de début : ' . $this->abonnement->date_debut) // Format de la date si nécessaire
+            ->line('Date de fin : ' . $this->abonnement->date_fin) // Format de la date si nécessaire
+            ->line('N\'oubliez pas de renouveler cet abonnement avant la date d\'échéance.')
             ->line('Merci d\'utiliser notre application!');
     }
 }

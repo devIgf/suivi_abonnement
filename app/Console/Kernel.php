@@ -33,18 +33,32 @@ class Kernel extends ConsoleKernel
 
     //Envois des e-mail à Diop
     protected function schedule(Schedule $schedule) 
-    {   
-        // Log::info('Scheduler running at ' . now());
-        $schedule->call(function () {
-            // Récupérer les abonnements qui expirent dans 3 jours
-            $abonnements = Abonnement::whereDate('date_fin', '<=', now()->addDays(7))->get();
-    
-            foreach ($abonnements as $abonnement) {
-                Notification::route('mail', 'justeamour05@gmail.com') // Adresse e-mail destinataire
+{   
+    $schedule->call(function () {
+        // Récupérer les abonnements qui expirent dans 7 jours
+        $abonnements = Abonnement::whereDate('date_fin', '<=', now()->addDays(7))->get();
+
+         // Liste des destinataires
+         $destinataires = [
+            'justeamour05@gmail.com',
+        ];
+
+        foreach ($abonnements as $abonnement) {
+            // Récupérer l'utilisateur associé à l'abonnement
+            $user = $abonnement->user; // Cela suppose que la relation est définie
+
+            if ($user) { // Vérifiez si l'utilisateur existe
+                // Envoyer la notification à l'adresse e-mail codée en dur
+                Notification::route('mail', $destinataires) // Adresse e-mail destinataire
                     ->notify(new RappelEcheanceNotification($abonnement));
+            } else {
+                Log::warning('Aucun utilisateur associé pour l\'abonnement : ' . $abonnement->id);
             }
-        })->everyTenMinutes(); // Assurez-vous que cette ligne est présente
-    }
+        }
+    })->everyTwoMinutes();
+}
+
+
     
     
 

@@ -83,7 +83,8 @@ class AbonnementController extends Controller
         // Sauvegarder les modifications
         $abonnement->save();
     
-        return redirect()->route('abonnements.index')->with('success', 'Abonnement mis à jour avec succès.');
+        // return redirect()->route('abonnements.index')->with('success', 'Abonnement mis à jour avec succès.');
+        return redirect()->back()->with('success', 'Abonnement mis à jour avec succès.');
     }
     
 
@@ -92,6 +93,6 @@ class AbonnementController extends Controller
 
     public function destroy(Abonnement $abonnement) {
         $abonnement->delete();
-        return redirect()->route('abonnements.index')->with('success', 'Abonnement supprimé avec succès.');
+        return redirect()->back()->with('success', 'Abonnement supprimé avec succès.');
     }
 }
