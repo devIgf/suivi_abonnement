@@ -28,14 +28,16 @@ class AbonnementController extends Controller
 {
     $request->validate([
         'nom' => 'required|string|max:255',
+        'prix' => 'required|numeric',
         'date_debut' => 'required|date',
         'date_fin' => 'required|date',
-        'user_id' => 'required|exists:users,id', // Validation pour s'assurer que l'utilisateur existe
+        'user_id' => 'required|exists:users,id',
     ]);
 
     // Créer un nouvel abonnement
     Abonnement::create([
         'nom' => $request->nom,
+        'prix' => $request->prix,
         'user_id' => $request->user_id, // Associer l'abonnement à l'utilisateur
         'date_debut' => $request->date_debut,
         'date_fin' => $request->date_fin,

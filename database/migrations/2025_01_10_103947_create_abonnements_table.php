@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('abonnements', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Clé étrangère vers users
-            $table->string('nom'); // Nom de l'abonnement
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('nom'); 
+            $table->integer('prix');
             $table->date('date_debut');
             $table->date('date_fin');
             $table->timestamps();

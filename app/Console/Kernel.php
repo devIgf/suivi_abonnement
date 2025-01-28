@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Models\Abonnement;
 use App\Notifications\RappelEcheanceNotification;
+use App\Notifications\RegroupementEcheanceNotification;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Log;
@@ -32,34 +33,57 @@ class Kernel extends ConsoleKernel
 
 
     //Envois des e-mail à Diop
-    protected function schedule(Schedule $schedule) 
+//     protected function schedule(Schedule $schedule) 
+// {   
+//     $schedule->call(function () {
+//         $abonnements = Abonnement::whereDate('date_fin', '<=', now()->addDays(7))->get();
+
+//          $destinataires = [
+//             'justeamour05@gmail.com',
+//             'adama.coulibaly@igf-sn.com'
+//         ];
+
+//         foreach ($abonnements as $abonnement) {
+//             $user = $abonnement->user; 
+
+//             if ($user) {
+//                 Notification::route('mail', $destinataires) 
+//                     ->notify(new RappelEcheanceNotification($abonnement));
+//             } else {
+//                 Log::warning('Aucun utilisateur associé pour l\'abonnement : ' . $abonnement->id);
+//             }
+//         }
+//     })->everyTwoMinutes();
+// }
+
+
+protected function schedule(Schedule $schedule) 
 {   
     $schedule->call(function () {
-        // Récupérer les abonnements qui expirent dans 7 jours
+        // Récupérer tous les abonnements qui expirent dans 7 jours
         $abonnements = Abonnement::whereDate('date_fin', '<=', now()->addDays(7))->get();
 
-         // Liste des destinataires
-         $destinataires = [
-            'justeamour05@gmail.com',
-        ];
-
-        foreach ($abonnements as $abonnement) {
-            // Récupérer l'utilisateur associé à l'abonnement
-            $user = $abonnement->user; // Cela suppose que la relation est définie
-
-            if ($user) { // Vérifiez si l'utilisateur existe
-                // Envoyer la notification à l'adresse e-mail codée en dur
-                Notification::route('mail', $destinataires) // Adresse e-mail destinataire
-                    ->notify(new RappelEcheanceNotification($abonnement));
-            } else {
-                Log::warning('Aucun utilisateur associé pour l\'abonnement : ' . $abonnement->id);
+        // Vérifiez s'il y a des abonnements à notifier
+        if ($abonnements->isNotEmpty()) {
+            // Construire le message
+            $message = "Voici les abonnements qui arrivent à terme :\n\n";
+            foreach ($abonnements as $abonnement) {
+                $userName = $abonnement->user ? $abonnement->user->name : 'Cher utilisateur';
+                $message .= "\n\n Abonnement : {$abonnement->nom}\n";
+                $message .= "\n\n Client : {$userName}\n";
+                $message .= "\n\n Prix : {$abonnement->prix} FCFA\n";
+                $message .= "\n\n Date de début : {$abonnement->date_debut}\n";
+                $message .= "\n\n Date de fin : {$abonnement->date_fin}\n\n";
             }
+
+            // Envoyer l'e-mail avec tous les détails
+            Notification::route('mail', 'justeamour05@gmail.com')
+                ->notify(new RegroupementEcheanceNotification($message));
         }
-    })->everyTwoMinutes();
+    })->everyMinute();
 }
 
 
-    
     
 
 }

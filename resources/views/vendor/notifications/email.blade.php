@@ -6,7 +6,7 @@
 @if ($level === 'error')
 # @lang('Whoops!')
 @else
-# @lang('Bonjour et bienvenue dans notre application!')
+# @lang('Hello!')
 @endif
 @endif
 
@@ -20,9 +20,9 @@
 
 {{-- Outro Lines --}}
 @foreach ($outroLines as $line)
-{{ $line }}
-
+{{ $line }}<br> <br>
 @endforeach
+
 
 {{-- Salutation --}}
 @if (! empty($salutation))

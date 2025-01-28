@@ -25,6 +25,11 @@
         <label for="nom" class="form-label">Nom de l'Abonnement</label>
         <input type="text" class="form-control" id="nom" name="nom" required>
     </div>
+    
+    <div class="mb-3">
+        <label for="prix" class="form-label">Prix de l'Abonnement</label>
+        <input type="number" class="form-control" id="prix" name="prix" required>
+    </div>
 
     <div class="mb-3">
         <label for="date_debut" class="form-label">Date de Début</label>
