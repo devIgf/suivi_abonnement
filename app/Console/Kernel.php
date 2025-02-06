@@ -61,27 +61,28 @@ protected function schedule(Schedule $schedule)
 {   
     $schedule->call(function () {
         // Récupérer tous les abonnements qui expirent dans 7 jours
-        $abonnements = Abonnement::whereDate('date_fin', '<=', now()->addDays(7))->get();
+        $abonnements = Abonnement::whereDate('date_fin', '<', now()->addDays(15))->get();
 
         // Vérifiez s'il y a des abonnements à notifier
         if ($abonnements->isNotEmpty()) {
-            // Construire le message
-            $message = "Voici les abonnements qui arrivent à terme :\n\n";
+            // Construire le message sous forme de tableau
             foreach ($abonnements as $abonnement) {
                 $userName = $abonnement->user ? $abonnement->user->name : 'Cher utilisateur';
-                $message .= "\n\n Abonnement : {$abonnement->nom}\n";
-                $message .= "\n\n Client : {$userName}\n";
-                $message .= "\n\n Prix : {$abonnement->prix} FCFA\n";
-                $message .= "\n\n Date de début : {$abonnement->date_debut}\n";
-                $message .= "\n\n Date de fin : {$abonnement->date_fin}\n\n";
+                $lines[] = "Abonnement : {$abonnement->nom}";
+                $lines[] = "Client : {$userName}";
+                $lines[] = "Prix : {$abonnement->prix} FCFA";
+                $lines[] = "Date de début : {$abonnement->date_debut}";
+                $lines[] = "Date de fin : {$abonnement->date_fin}";
+                $lines[] = ""; // Ligne vide pour séparer les abonnements
             }
 
             // Envoyer l'e-mail avec tous les détails
             Notification::route('mail', 'justeamour05@gmail.com')
-                ->notify(new RegroupementEcheanceNotification($message));
+                ->notify(new RegroupementEcheanceNotification($lines));
         }
-    })->everyMinute();
+    })->everyFourHours();
 }
+
 
 
     

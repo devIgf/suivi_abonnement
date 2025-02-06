@@ -2,6 +2,7 @@
 
 @section('content')
     <div class="container">
+        <img src="images/igf.PNG" alt="" height="100" width="100">
         <h1>Liste des Clients</h1>
         <a href="{{ route('clients.create') }}" class="btn btn-primary">Ajouter un Client</a>
         

@@ -9,16 +9,17 @@ use Illuminate\Notifications\Notification;
 
 class RegroupementEcheanceNotification extends Notification
 {
-    use Queueable;
+    // use Queueable;
 
-    protected $message;
+    protected $lines;
+
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($message)
+    public function __construct($lines)
     {
-        $this->message = $message;
+        $this->lines = $lines;
     }
 
     /**
@@ -34,15 +35,16 @@ class RegroupementEcheanceNotification extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Rappel d\'Échéance des Abonnements') 
-            ->greeting('Bonjour IGF!')
-            ->line($this->message)
-            ->line('N\'oubliez pas de renouveler vos abonnements avant leur date d\'échéance.')
-            ->line('Merci d\'utiliser notre application!');
+            ->subject('Rappel d\'Échéance des Abonnements')
+            ->view('vendor.notifications.email', [
+                'greeting' => 'Bonjour IGF!',
+                'lines' => $this->lines
+            ]);
     }
+    
 
     /**
      * Get the array representation of the notification.
@@ -56,3 +58,4 @@ class RegroupementEcheanceNotification extends Notification
         ];
     }
 }
+ 
