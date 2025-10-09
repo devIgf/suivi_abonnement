@@ -7,8 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class RappelEcheanceNotification extends Notification implements ShouldQueue {
-    use Queueable;
+class RappelEcheanceNotification extends Notification {
+    // use Queueable;
 
     protected $abonnement;
 

@@ -9,6 +9,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Mail;
 
 class Kernel extends ConsoleKernel
 {
@@ -25,66 +26,55 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }
 
 
 
-    //Envois des e-mail à Diop
-//     protected function schedule(Schedule $schedule) 
-// {   
-//     $schedule->call(function () {
-//         $abonnements = Abonnement::whereDate('date_fin', '<=', now()->addDays(7))->get();
+    // protected function schedule(Schedule $schedule)
+    // {
+    //     $schedule->call(function () {
+    //         Log::info('Scheduler exécuté : envoi notifications');
+    //         $abonnements = Abonnement::whereBetween('date_fin', [now(), now()->addDays(15)])->get();
 
-//          $destinataires = [
-//             'justeamour05@gmail.com',
-//             'adama.coulibaly@igf-sn.com'
-//         ];
-
-//         foreach ($abonnements as $abonnement) {
-//             $user = $abonnement->user; 
-
-//             if ($user) {
-//                 Notification::route('mail', $destinataires) 
-//                     ->notify(new RappelEcheanceNotification($abonnement));
-//             } else {
-//                 Log::warning('Aucun utilisateur associé pour l\'abonnement : ' . $abonnement->id);
-//             }
-//         }
-//     })->everyTwoMinutes();
-// }
+    //         foreach ($abonnements as $abonnement) {
+    //             $user = $abonnement->user;
+    //             if ($user) {
+    //                 $user->notify(new RappelEcheanceNotification($abonnement));
+    //             }
+    //         }
+    //     })->everyMinute();
+    // }
 
 
-protected function schedule(Schedule $schedule) 
-{   
-    $schedule->call(function () {
-        // Récupérer tous les abonnements qui expirent dans 7 jours
-        $abonnements = Abonnement::whereDate('date_fin', '<', now()->addDays(15))->get();
 
-        // Vérifiez s'il y a des abonnements à notifier
-        if ($abonnements->isNotEmpty()) {
-            // Construire le message sous forme de tableau
+    protected function schedule(Schedule $schedule)
+    {
+        $schedule->call(function () {
+            Log::info('Scheduler exécuté : envoi notifications');
+
+            // Envoi d'un mail test simple pour vérifier la config mail
+            Mail::raw('Ceci est un mail de test envoyé depuis le scheduler Laravel.', function ($message) {
+                $message->to('justeamour05@gmail.com')
+                    ->subject('Test Mail depuis Scheduler Laravel');
+            });
+
+            // Votre code original d'envoi de notifications à vos abonnements
+            $abonnements = Abonnement::whereBetween('date_fin', [now(), now()->addDays(15)])->get();
             foreach ($abonnements as $abonnement) {
-                $userName = $abonnement->user ? $abonnement->user->name : 'Cher utilisateur';
-                $lines[] = "Abonnement : {$abonnement->nom}";
-                $lines[] = "Client : {$userName}";
-                $lines[] = "Prix : {$abonnement->prix} FCFA";
-                $lines[] = "Date de début : {$abonnement->date_debut}";
-                $lines[] = "Date de fin : {$abonnement->date_fin}";
-                $lines[] = ""; // Ligne vide pour séparer les abonnements
+                $user = $abonnement->user;
+                if ($user) {
+                    $user->notify(new RappelEcheanceNotification($abonnement));
+                }
             }
-
-            // Envoyer l'e-mail avec tous les détails
-            Notification::route('mail', 'justeamour05@gmail.com')
-                ->notify(new RegroupementEcheanceNotification($lines));
-        }
-    })->everyFourHours();
+        })->everyMinute();
+    }
 }
 
 
-
-    
-
-}
+// php artisan tinker
+// php artisan schedule:run
+// $user = App\Models\User::find(2); // ID d'un utilisateur valide
+// $user->notify(new App\Notifications\RappelEcheanceNotification(1));

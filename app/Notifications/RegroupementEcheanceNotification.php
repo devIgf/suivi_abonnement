@@ -44,7 +44,7 @@ class RegroupementEcheanceNotification extends Notification
                 'lines' => $this->lines
             ]);
     }
-    
+
 
     /**
      * Get the array representation of the notification.
@@ -54,8 +54,7 @@ class RegroupementEcheanceNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'message_lines' => $this->lines,
         ];
     }
 }
- 
