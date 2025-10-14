@@ -26,7 +26,7 @@ class RappelEcheanceNotification extends Notification {
 
     return (new MailMessage)
         ->subject('Rappel d\'Échéance d\'Abonnement')
-        ->greeting('Bonjour IGF')
+        ->greeting('Bonjour Bineta!')
         ->line('Ceci est un rappel concernant l\'abonnement : ' . $this->abonnement->nom . ' du client ' . $userName)
         ->line('Date de début : ' . $this->abonnement->date_debut)
         ->line('Date de fin : ' . $this->abonnement->date_fin)

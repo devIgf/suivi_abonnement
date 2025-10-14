@@ -15,7 +15,7 @@
             </ul>
         </div>
     @endif
-
+ 
     <form action="{{ route('abonnements.store') }}" method="POST">
     @csrf
     <!-- Champ caché pour user_id -->

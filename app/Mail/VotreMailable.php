@@ -22,7 +22,7 @@ class VotreMailable extends Mailable
 
     public function build()
     {
-        return $this->from('igfdev0@gmail.com')
+        return $this->from('justeamour05@gmail.com')
                     ->subject('Rappel d\'échéance')
                     ->view('vendor.notification.email') // votre Vue Blade email
                     ->with('data', $this->data);

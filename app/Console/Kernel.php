@@ -25,33 +25,60 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->call(function () {
-            Log::info('=== DEBUT Scheduler ===');
+            Log::info('Scheduler exécuté : envoi notifications');
 
-            // Mail de test
-            Mail::raw('Ceci est un mail de test envoyé depuis le scheduler Laravel.', function ($message) {
-                $message->to('justeamour05@gmail.com')
-                    ->subject('Test Mail depuis Scheduler Laravel');
-            });
-            Log::info('Mail de test envoyé');
+            // Récupération des abonnements (expire dans 15 jours OU déjà expirés)
+            $abonnements = Abonnement::with('user')
+                ->where('date_fin', '<=', now()->addDays(15))
+                ->get();
 
-            // Recherche des abonnements
-            $abonnements = Abonnement::whereBetween('date_fin', [now(), now()->addDays(15)])->get();
             Log::info('Abonnements trouvés : ' . $abonnements->count());
 
-            foreach ($abonnements as $abonnement) {
-                $user = $abonnement->user;
-                Log::info('Abonnement ID: ' . $abonnement->id . ', Nom: ' . $abonnement->nom . ', Date fin: ' . $abonnement->date_fin);
+            // Si des abonnements existent, envoyer UN SEUL mail groupé
+            if ($abonnements->count() > 0) {
+                // Préparer le contenu du mail
+                $lignes = [];
+                $lignes[] = "Bonjour Binet@,";
+                $lignes[] = "";
+                $lignes[] = "Vous avez " . $abonnements->count() . " abonnement(s) nécessitant votre attention :";
+                $lignes[] = "";
+                $lignes[] = str_repeat("-", 80);
+                $lignes[] = "";
 
-                if ($user) {
-                    Log::info('Envoi notification à : ' . $user->email);
-                    $user->notify(new RappelEcheanceNotification($abonnement));
-                    Log::info('Notification envoyée avec succès');
-                } else {
-                    Log::warning('Pas d\'utilisateur pour l\'abonnement ID: ' . $abonnement->id);
+                foreach ($abonnements as $abonnement) {
+                    $userName = $abonnement->user ? $abonnement->user->name : 'Client inconnu';
+                    $joursRestants = now()->diffInDays($abonnement->date_fin, false);
+                    $statut = $joursRestants >= 0
+                        ? "expire dans {$joursRestants} jour(s)"
+                        : "expiré depuis " . abs($joursRestants) . " jour(s)";
+
+                    $lignes[] = "📌 CLIENT : {$userName}";
+                    $lignes[] = "   Abonnement : {$abonnement->nom}";
+                    $lignes[] = "   Date de fin : {$abonnement->date_fin} ({$statut})";
+                    $lignes[] = "   Prix : " . number_format($abonnement->prix, 0, ',', ' ') . " FCFA";
+                    $lignes[] = "";
                 }
-            }
 
-            Log::info('=== FIN Scheduler ===');
+                $lignes[] = str_repeat("-", 80);
+                $lignes[] = "";
+                $lignes[] = "Merci de renouveler ces abonnements dès que possible.";
+                $lignes[] = "";
+                $lignes[] = "Cordialement,";
+                $lignes[] = "Votre système de gestion d'abonnements";
+
+                // Convertir le tableau en texte
+                $contenu = implode("\n", $lignes);
+
+                // Envoyer le mail directement à l'adresse du manager
+                Mail::raw($contenu, function ($message) {
+                    $message->to('justeamour05@gmail.com')  // Email au secretariat
+                        ->subject('📋 Rappel d\'Échéance des Abonnements');
+                });
+
+                Log::info('Mail groupé envoyé au manager');
+            } else {
+                Log::info('Aucun abonnement à notifier');
+            }
         })->everyMinute();
     }
 }
