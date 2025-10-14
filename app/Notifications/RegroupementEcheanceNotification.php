@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notification;
 
 class RegroupementEcheanceNotification extends Notification
 {
-    // use Queueable;
+    // use Queueable; 
 
     protected $lines;
 

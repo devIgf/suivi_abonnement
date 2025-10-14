@@ -13,17 +13,6 @@ use Illuminate\Support\Facades\Mail;
 
 class Kernel extends ConsoleKernel
 {
-    /**
-     * Define the application's command schedule.
-     */
-    // protected function schedule(Schedule $schedule): void
-    // {
-    //     // $schedule->command('inspire')->hourly();
-    // }
-
-    /**
-     * Register the commands for the application.
-     */
     protected function commands(): void
     {
         $this->load(__DIR__ . '/Commands');
@@ -33,42 +22,36 @@ class Kernel extends ConsoleKernel
 
 
 
-    // protected function schedule(Schedule $schedule)
-    // {
-    //     $schedule->call(function () {
-    //         Log::info('Scheduler exécuté : envoi notifications');
-    //         $abonnements = Abonnement::whereBetween('date_fin', [now(), now()->addDays(15)])->get();
-
-    //         foreach ($abonnements as $abonnement) {
-    //             $user = $abonnement->user;
-    //             if ($user) {
-    //                 $user->notify(new RappelEcheanceNotification($abonnement));
-    //             }
-    //         }
-    //     })->everyMinute();
-    // }
-
-
-
     protected function schedule(Schedule $schedule)
     {
         $schedule->call(function () {
-            Log::info('Scheduler exécuté : envoi notifications');
+            Log::info('=== DEBUT Scheduler ===');
 
-            // Envoi d'un mail test simple pour vérifier la config mail
+            // Mail de test
             Mail::raw('Ceci est un mail de test envoyé depuis le scheduler Laravel.', function ($message) {
                 $message->to('justeamour05@gmail.com')
                     ->subject('Test Mail depuis Scheduler Laravel');
             });
+            Log::info('Mail de test envoyé');
 
-            // Votre code original d'envoi de notifications à vos abonnements
+            // Recherche des abonnements
             $abonnements = Abonnement::whereBetween('date_fin', [now(), now()->addDays(15)])->get();
+            Log::info('Abonnements trouvés : ' . $abonnements->count());
+
             foreach ($abonnements as $abonnement) {
                 $user = $abonnement->user;
+                Log::info('Abonnement ID: ' . $abonnement->id . ', Nom: ' . $abonnement->nom . ', Date fin: ' . $abonnement->date_fin);
+
                 if ($user) {
+                    Log::info('Envoi notification à : ' . $user->email);
                     $user->notify(new RappelEcheanceNotification($abonnement));
+                    Log::info('Notification envoyée avec succès');
+                } else {
+                    Log::warning('Pas d\'utilisateur pour l\'abonnement ID: ' . $abonnement->id);
                 }
             }
+
+            Log::info('=== FIN Scheduler ===');
         })->everyMinute();
     }
 }

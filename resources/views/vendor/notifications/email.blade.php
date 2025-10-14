@@ -1,26 +1,58 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rappel d'Échéance</title>
-</head>
-<body style="justify-content:center;font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <h2 style="color: #0056b3;">{{ $greeting ?? 'Bonjour!' }}</h2>
+<x-mail::message>
+{{-- Greeting --}}
+@if (! empty($greeting))
+# {{ $greeting }}
+@else
+@if ($level === 'error')
+# @lang('Whoops!')
+@else
+# @lang('Hello!')
+@endif
+@endif
 
-    <p>Voici les abonnements qui arrivent à échéance :</p>
+{{-- Intro Lines --}}
+@foreach ($introLines as $line)
+{{ $line }}
 
-    @foreach ($lines as $line)
-        @if (str_starts_with($line, 'Abonnement :'))
-            <p><strong>{{ $line }}</strong></p>
-        @else
-            <p>{{ $line }}</p>
-        @endif
-    @endforeach
+@endforeach
 
-    <p><i>Merci d'utiliser notre application!</i></p>
+{{-- Action Button --}}
+@isset($actionText)
+<?php
+    $color = match ($level) {
+        'success', 'error' => $level,
+        default => 'primary',
+    };
+?>
+<x-mail::button :url="$actionUrl" :color="$color">
+{{ $actionText }}
+</x-mail::button>
+@endisset
 
-    <hr>
-    <p style="font-size: 12px; color: #666;">Ceci est un email automatique, merci de ne pas y répondre.</p>
-</body>
-</html>
+{{-- Outro Lines --}}
+@foreach ($outroLines as $line)
+{{ $line }}
+
+@endforeach
+
+{{-- Salutation --}}
+@if (! empty($salutation))
+{{ $salutation }}
+@else
+@lang('Regards'),<br>
+{{ config('app.name') }}
+@endif
+
+{{-- Subcopy --}}
+@isset($actionText)
+<x-slot:subcopy>
+@lang(
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
+    'into your web browser:',
+    [
+        'actionText' => $actionText,
+    ]
+) <span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span>
+</x-slot:subcopy>
+@endisset
+</x-mail::message>
