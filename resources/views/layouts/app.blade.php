@@ -20,7 +20,7 @@
     </main>
 
     <footer class="container text-center my-4">
-        <p>&copy; {{ date('Y') }} IGF-Sn. Tous droits réservés.</p>
+        <p>&copy; <i>IGF SARL 2025</i>. Tous droits réservés.</p>
         <script>
                 function updateEndDate() {
                     const startDate = new Date(document.getElementById('date_debut').value);

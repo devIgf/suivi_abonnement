@@ -1,0 +1,27 @@
+.expiring-soon {
+    background-color: bisque;
+}
+
+select[disabled] {
+    background-color: #f8f9fa !important;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.table-warning {
+    background-color: #fff3cd !important;
+}
+
+@media (max-width: 768px) {
+    h1.card-title {
+        font-size: 1.5rem;
+    }
+
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}

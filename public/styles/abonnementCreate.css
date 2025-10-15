@@ -1,0 +1,31 @@
+.form-label {
+    color: #333;
+}
+
+.btn {
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: white;
+}
+
+input[readonly] {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    h1.h4 {
+        font-size: 1.3rem;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}

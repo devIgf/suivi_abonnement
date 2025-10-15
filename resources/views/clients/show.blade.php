@@ -1,82 +1,101 @@
 @extends('layouts.app')
+<link rel="stylesheet" href="{{ asset(path: 'styles/clientsShow.css') }}">
 
 @section('content')
-<style>
-    .expiring-soon {
-        background-color: bisque;
-    }
 
-    select[disabled] {
-        background-color: rgb(143, 0, 0);
-        /* Grise la couleur */
-        cursor: not-allowed;
-        /* Change le curseur */
-        opacity: 0.6;
-        /* Réduit l'opacité */
-    }
-</style>
-<div class="container">
-    <h1>Détails de l'Utilisateur : {{ $user->name }}</h1>
-    <p>Email : {{ $user->email }}</p>
+<div class="container py-4">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body text-center">
+            <h1 class="card-title mb-3 text-primary fw-bold">
+                Utilisateur : {{ $user->name }}
+            </h1>
+            <p class="text-muted mb-4">📧 {{ $user->email }}</p>
 
-    <a href="{{ route('abonnements.create', ['user_id' => $user->id]) }}" class="btn btn-primary">Ajouter un Abonnement</a>
-    <a href="{{ route('accueil') }}" class="btn btn-secondary">Retour</a>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a href="{{ route('abonnements.create', ['user_id' => $user->id]) }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Ajouter un abonnement
+                </a>
+                <a href="{{ route('accueil') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour
+                </a>
+            </div>
+        </div>
+    </div>
 
-    <h2>Abonnements</h2>
-    @if ($abonnements->isEmpty())
-    <p>Aucun abonnement trouvé pour cet utilisateur.</p>
-    @else
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Date de Début</th>
-                <th>Date de Fin</th>
-                <th>Prix</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($abonnements as $abonnement)
-            @php
-            $dateFin = \Carbon\Carbon::parse($abonnement->date_fin);
-            $isExpiringSoon = $dateFin->diffInDays(now()) <= 15;
-                @endphp
-                <tr class="{{ $isExpiringSoon ? 'expiring-soon' : '' }}">
-                <td>{{ $abonnement->nom }}</td>
-                <td>{{ $abonnement->date_debut }}</td>
-                <td>{{ $abonnement->date_fin }}</td>
-                <td>{{ $abonnement->prix }}</td>
-                <td>
-                    <form action="{{ route('abonnements.update', $abonnement) }}" method="POST" style="display:inline;" class="renewal-form">
-                        @csrf
-                        @method('PUT')
-                        <select name="renewal_type" class="form-control renewal-select" {{-- Ajout de la classe 'renewal-select' --}}
-                            style="display: inline-block; width: 120px;"
-                            {{ $isExpiringSoon ? '' : 'disabled' }}
-                            title="{{ $isExpiringSoon ? '' : 'Le renouvellement ne peut être effectué que si l\'abonnement expire dans 7 jours ou moins.' }}">
-                            <option value="">Sélectionnez un type</option>
-                            <option value="mensuel">Mensuel</option>
-                            <option value="trimestriel">Trimestriel</option>
-                            <option value="semestriel">Semestriel</option>
-                            <option value="annuel">Annuel</option>
-                        </select>
-                    </form>
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0 fw-bold">Liste des abonnements</h2>
+        </div>
+        <div class="card-body">
+            @if ($abonnements->isEmpty())
+            <p class="text-center text-muted">Aucun abonnement trouvé pour cet utilisateur.</p>
+            @else
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Nom</th>
+                            <th>Date de début</th>
+                            <th>Date de fin</th>
+                            <th>Prix</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($abonnements as $abonnement)
+                        @php
+                        $dateFin = \Carbon\Carbon::parse($abonnement->date_fin);
+                        $needsRenewal = $dateFin->lessThanOrEqualTo(now()->addDays(15));
+                        @endphp
+                        <tr class="{{ $needsRenewal ? 'table-warning' : '' }}">
+                            <td>{{ $abonnement->nom }}</td>
+                            <td>{{ $abonnement->date_debut }}</td>
+                            <td>{{ $abonnement->date_fin }}</td>
+                            <td>{{ number_format($abonnement->prix, 0, ',', ' ') }} FCFA</td>
+                            <td class="text-center">
+                                <div class="d-flex flex-column flex-md-row justify-content-center align-items-center gap-2">
 
-                    <!-- Formulaire de suppression -->
-                    <form action="{{ route('abonnements.destroy', $abonnement) }}" method="POST" class="delete-form" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="button" class="btn btn-danger delete-btn">Supprimer</button>
-                    </form>
-                </td>
-                </tr>
-                @endforeach
-        </tbody>
+                                    <!-- Formulaire de renouvellement -->
+                                    <form action="{{ route('abonnements.update', $abonnement) }}" method="POST" class="renewal-form d-flex align-items-center gap-2">
+                                        @csrf
+                                        @method('PUT')
+                                        <select
+                                            name="renewal_type"
+                                            class="form-select form-select-sm renewal-select"
+                                            style="width: 150px;"
+                                            @if(!$needsRenewal)
+                                            disabled
+                                            title="Renouvellement disponible seulement si l'abonnement expire dans 15 jours"
+                                            @else
+                                            title="Choisissez un type de renouvellement"
+                                            @endif>
+                                            <option value="">Type de renouvellement</option>
+                                            <option value="mensuel">Mensuel</option>
+                                            <option value="trimestriel">Trimestriel</option>
+                                            <option value="semestriel">Semestriel</option>
+                                            <option value="annuel">Annuel</option>
+                                        </select>
 
-    </table>
+                                    </form>
 
-    @endif
+                                    <!-- Formulaire de suppression -->
+                                    <form action="{{ route('abonnements.destroy', $abonnement) }}" method="POST" class="delete-form">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="btn btn-sm btn-danger delete-btn">
+                                            <i class="bi bi-trash"></i> Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            @endif
+        </div>
+    </div>
 </div>
 
 

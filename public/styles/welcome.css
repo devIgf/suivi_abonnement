@@ -1,0 +1,31 @@
+.table th {
+    white-space: nowrap;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.btn-outline-info {
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-info:hover {
+    background-color: #0dcaf0;
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    h1.h3 {
+        font-size: 1.25rem;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+}
