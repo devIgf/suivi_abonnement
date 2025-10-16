@@ -79,7 +79,7 @@ class Kernel extends ConsoleKernel
             } else {
                 Log::info('Aucun abonnement à notifier');
             }
-        })->everyFiveMinutes();
+        })->dailyAt(time: '10:10');
     }
 }
 

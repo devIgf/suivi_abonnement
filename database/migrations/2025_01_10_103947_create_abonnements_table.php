@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('nom'); 
             $table->integer('prix');
+            $table->string('type_abonnement');
             $table->date('date_debut');
             $table->date('date_fin');
             $table->timestamps();
