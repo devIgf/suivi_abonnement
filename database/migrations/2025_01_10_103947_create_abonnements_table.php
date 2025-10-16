@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('abonnements', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('nom'); 
-            $table->integer('prix');
+            $table->string('nom');
             $table->string('type_abonnement');
+            $table->integer('prix');
             $table->date('date_debut');
             $table->date('date_fin');
             $table->timestamps();
