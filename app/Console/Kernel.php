@@ -38,7 +38,7 @@ class Kernel extends ConsoleKernel
             if ($abonnements->count() > 0) {
                 // Préparer le contenu du mail
                 $lignes = [];
-                $lignes[] = "Bonjour Binet@,";
+                $lignes[] = "Bonjour Binet@!";
                 $lignes[] = "";
                 $lignes[] = "Vous avez " . $abonnements->count() . " abonnement(s) nécessitant votre attention :";
                 $lignes[] = "";
@@ -69,9 +69,9 @@ class Kernel extends ConsoleKernel
                 // Convertir le tableau en texte
                 $contenu = implode("\n", $lignes);
 
-                // Envoyer le mail directement à l'adresse du manager
                 Mail::raw($contenu, function ($message) {
-                    $message->to('justeamour05@gmail.com')  // Email au secretariat
+                    $emails = explode(',', env('MANAGER_EMAILS'));
+                    $message->to($emails)
                         ->subject('📋 Rappel d\'Échéance des Abonnements');
                 });
 
@@ -79,7 +79,7 @@ class Kernel extends ConsoleKernel
             } else {
                 Log::info('Aucun abonnement à notifier');
             }
-        })->everyMinute();
+        })->everyFiveMinutes();
     }
 }
 
